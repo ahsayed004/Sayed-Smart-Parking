@@ -18,8 +18,8 @@ Usage:
 import cv2
 import numpy as np
 from ultralytics import YOLO
-import sys
 import os
+import argparse
 
 
 class SimpleParkingDetector:
@@ -349,23 +349,23 @@ def main():
     print("  🅿️  SMART PARKING AI - SIMPLE VERSION")
     print("  Reliable detection for demos")
     print("=" * 50)
-    
-    if len(sys.argv) < 2:
-        print("\nUsage: python smart_parking_simple.py <image>")
-        print("\nExample: python smart_parking_simple.py parking.jpg")
-        return
-    
-    image_path = sys.argv[1]
+
+    parser = argparse.ArgumentParser(description="Detect occupied and empty parking spaces in an image.")
+    parser.add_argument("image", help="Path to the input parking image")
+    parser.add_argument("--output", default="result.jpg", help="Output image filename (default: result.jpg)")
+    args = parser.parse_args()
+
+    image_path = args.image
     
     if not os.path.exists(image_path):
-        print(f"❌ Image not found: {image_path}")
+        print(f"❌ Error: Image not found: {image_path}")
         return
     
     detector = SimpleParkingDetector()
-    detector.process_image(image_path, output_path='result.jpg', show=True)
+    detector.process_image(image_path, output_path=args.output, show=True)
     
     print("\n" + "=" * 50)
-    print("  ✅ Done! Check 'result.jpg'")
+    print(f"  ✅ Done! Check '{args.output}'")
     print("=" * 50)
 
 

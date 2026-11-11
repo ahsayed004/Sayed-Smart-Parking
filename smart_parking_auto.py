@@ -17,8 +17,8 @@ import cv2
 import numpy as np
 from ultralytics import YOLO
 from collections import defaultdict
-import sys
 import os
+import argparse
 
 
 class AutoParkingDetector:
@@ -629,19 +629,19 @@ def main():
     print("  Automatic Parking Slot Detection & Occupancy Analysis")
     print("=" * 60)
     
-    if len(sys.argv) < 2:
-        print("\nUsage:")
-        print("  python smart_parking_auto.py <image_path>")
-        print("\nExample:")
-        print("  python smart_parking_auto.py parking_lot.jpg")
-        print("\nThe system will automatically:")
-        print("  1. Detect all vehicles in the image")
-        print("  2. Identify parking slot boundaries")
-        print("  3. Determine which slots are occupied/available")
-        print("  4. Display results with statistics")
-        return
-    
-    image_path = sys.argv[1]
+    parser = argparse.ArgumentParser(
+        description="Detect occupied and empty parking spaces in an image.",
+        epilog="""The system will automatically:
+  1. Detect all vehicles in the image
+  2. Identify parking slot boundaries
+  3. Determine which slots are occupied/available
+  4. Display results with statistics""",
+        formatter_class=argparse.RawDescriptionHelpFormatter)
+    parser.add_argument("image", help="Path to the input parking image")
+    parser.add_argument("--output", default="detection_result.jpg", help="Output image filename (default: detection_result.jpg)")
+    args = parser.parse_args()
+
+    image_path = args.image
     
     if not os.path.exists(image_path):
         print(f"❌ Error: Image not found: {image_path}")
@@ -653,12 +653,12 @@ def main():
     # Process image
     output, slots = detector.process_image(
         image_path,
-        output_path='detection_result.jpg',
+        output_path=args.output,
         show=True
     )
     
     print("\n" + "=" * 60)
-    print("  ✅ Done! Check 'detection_result.jpg' for the output.")
+    print(f"  ✅ Done! Check '{args.output}' for the output.")
     print("=" * 60)
 
 

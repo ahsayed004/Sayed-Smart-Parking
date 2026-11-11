@@ -17,9 +17,9 @@ import cv2
 import numpy as np
 from ultralytics import YOLO
 import json
-import sys
 import os
 from pathlib import Path
+import argparse
 
 
 class SmartParkingV2:
@@ -466,19 +466,14 @@ def main():
     print("  Improved Detection with Multiple Modes")
     print("=" * 60)
     
-    # Parse arguments
-    if len(sys.argv) < 2:
-        print("\nUsage:")
-        print("  python smart_parking_v2.py <image>              # Detect vehicles")
-        print("  python smart_parking_v2.py <image> --define     # Define slots interactively")
-        print("  python smart_parking_v2.py <image> --config <slots.json>  # Use saved slots")
-        print("\nExample:")
-        print("  python smart_parking_v2.py parking_lot.jpg")
-        print("  python smart_parking_v2.py parking_lot.jpg --define")
-        print("  python smart_parking_v2.py parking_lot.jpg --config my_slots.json")
-        return
-    
-    image_path = sys.argv[1]
+    parser = argparse.ArgumentParser(description="Smart Parking AI with multiple detection modes.")
+    parser.add_argument("image", help="Path to the input parking image")
+    parser.add_argument("--output", default="detection_result.jpg", help="Output image filename (default: detection_result.jpg)")
+    parser.add_argument("--define", action="store_true", help="Interactively define parking spaces")
+    parser.add_argument("--config", metavar="FILE", help="Use parking spaces defined in a JSON configuration file")
+    args = parser.parse_args()
+
+    image_path = args.image
     
     if not os.path.exists(image_path):
         print(f"❌ Error: Image not found: {image_path}")
@@ -488,33 +483,31 @@ def main():
     detector = SmartParkingV2()
     
     # Determine mode
-    if '--define' in sys.argv:
+    if args.define:
         # Interactive slot definition mode
         detector.define_slots_interactive(image_path)
     
-    elif '--config' in sys.argv:
+    elif args.config:
         # Use predefined slots
-        config_idx = sys.argv.index('--config') + 1
-        if config_idx < len(sys.argv):
-            config_file = sys.argv[config_idx]
-            detector.detect_with_slots(
-                image_path, 
-                config_file,
-                output_path='detection_result.jpg'
-            )
-        else:
-            print("❌ Error: Please provide config file path after --config")
+        detector.detect_with_slots(
+            image_path,
+            args.config,
+            output_path=args.output
+        )
     
     else:
         # Default: Vehicle detection mode
         detector.detect_vehicles(
             image_path,
-            output_path='detection_result.jpg',
+            output_path=args.output,
             show=True
         )
     
     print("\n" + "=" * 60)
-    print("  Done!")
+    if args.define:
+        print("  Done!")
+    else:
+        print(f"  ✅ Done! Check '{args.output}'")
     print("=" * 60)
 
 

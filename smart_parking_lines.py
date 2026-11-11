@@ -22,8 +22,8 @@ import cv2
 import numpy as np
 from ultralytics import YOLO
 from sklearn.cluster import DBSCAN
-import sys
 import os
+import argparse
 
 
 class LineParkingDetector:
@@ -2042,19 +2042,14 @@ def main():
     print("  🅿️  SMART PARKING AI - LINE-BASED DETECTION")
     print("  Detects parking lines to find ALL slots")
     print("=" * 60)
-    
-    if len(sys.argv) < 2:
-        print("\nUsage:")
-        print("  python smart_parking_lines.py <image_path>")
-        print("\nOptions:")
-        print("  --debug    Show intermediate detection steps")
-        print("\nExample:")
-        print("  python smart_parking_lines.py parking_lot.jpg")
-        print("  python smart_parking_lines.py parking_lot.jpg --debug")
-        return
-    
-    image_path = sys.argv[1]
-    debug = '--debug' in sys.argv
+
+    parser = argparse.ArgumentParser(description="Detect occupied and empty parking spaces in an image.")
+    parser.add_argument("image", help="Path to the input parking image")
+    parser.add_argument("--output", default="detection_result.jpg", help="Output image filename (default: detection_result.jpg)")
+    parser.add_argument("--debug", action="store_true", help="Show intermediate detection steps")
+    args = parser.parse_args()
+
+    image_path = args.image
     
     if not os.path.exists(image_path):
         print(f"❌ Error: Image not found: {image_path}")
@@ -2064,13 +2059,13 @@ def main():
     
     output, slots = detector.process_image(
         image_path,
-        output_path='detection_result.jpg',
+        output_path=args.output,
         show=True,
-        debug=debug
+        debug=args.debug
     )
     
     print("\n" + "=" * 60)
-    print("  ✅ Done!")
+    print(f"  ✅ Done! Check '{args.output}'")
     print("=" * 60)
 
 

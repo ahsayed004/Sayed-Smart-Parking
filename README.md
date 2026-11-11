@@ -29,7 +29,7 @@ pip install -r requirements.txt
 python smart_parking_simple.py parking_lot.jpg
 ```
 
-The annotated result is saved as `result.jpg` and shown in a window (press any key to close). The YOLOv8 nano weights (`yolov8n.pt`) are included in the repo.
+The annotated result is saved as `result.jpg` and shown in a window (press any key to close). To choose a different filename, add `--output`, for example: `python smart_parking_simple.py parking_lot.jpg --output demo-result.jpg`. The default remains `result.jpg`. The YOLOv8 nano weights (`yolov8n.pt`) are included in the repo.
 
 Requires Python 3.9 or newer (developed on 3.12).
 
@@ -93,9 +93,10 @@ All scripts default to `yolov8n.pt` in the repository root.
 **Usage:**
 ```bash
 python smart_parking_simple.py <image_path>
+python smart_parking_simple.py parking_lot.jpg --output simple-result.jpg
 ```
 
-**Output:** Saves the annotated result to `result.jpg` and displays it in a window. Press any key to close.
+**Output:** Saves the annotated result to `result.jpg` by default, or to the path provided with `--output`. Displays it in a window; press any key to close.
 
 **When to use:** Best choice for presentations and demos. Produces clean, uniform grids that are easy to understand visually.
 
@@ -136,9 +137,13 @@ python smart_parking_detection.py parking_lot.jpg --define
 
 # Detect using saved slot configuration
 python smart_parking_detection.py parking_lot.jpg --config slots.json
+
+# Save a detected image with a custom filename (also works with --config)
+python smart_parking_detection.py parking_lot.jpg --output detection-custom.jpg
+python smart_parking_detection.py parking_lot.jpg --config slots.json --output configured-result.jpg
 ```
 
-**Output:** Saves annotated result to `detection_result.jpg`.
+**Output:** Detection modes save the annotated result to `detection_result.jpg` by default, or to the path provided with `--output`. Interactive `--define` mode saves slot definitions separately and does not use `--output`.
 
 **When to use:** When you need manual control over slot placement, or when automatic slot detection doesn't work well on your lot. Create a `slots.json` once with `--define`, then reuse it for repeated analysis.
 
@@ -161,9 +166,10 @@ python smart_parking_detection.py parking_lot.jpg --config slots.json
 **Usage:**
 ```bash
 python smart_parking_auto.py <image_path>
+python smart_parking_auto.py parking_lot.jpg --output auto-result.jpg
 ```
 
-**Output:** Saves annotated result to `detection_result.jpg` with a stats panel showing total slots, occupied/available count, and an occupancy bar.
+**Output:** Saves the annotated result to `detection_result.jpg` by default, or to the path provided with `--output`, with a stats panel showing total slots, occupied/available count, and an occupancy bar.
 
 **When to use:** Quick automated analysis where you don't want to define slots by hand. Works best with top-down or near-top-down images where vehicles are arranged in clear rows.
 
@@ -185,11 +191,12 @@ python smart_parking_auto.py <image_path>
 ```bash
 python smart_parking_lines.py <image_path>
 python smart_parking_lines.py <image_path> --debug
+python smart_parking_lines.py parking_lot.jpg --output lines-result.jpg
 ```
 
 `--debug` saves intermediate images (`debug_dilated.jpg`, `debug_closed.jpg`, `debug_inverted.jpg`, `debug_cleaned.jpg`) for tuning the line detection pipeline.
 
-**Output:** Saves annotated result to `detection_result.jpg`.
+**Output:** Saves the annotated result to `detection_result.jpg` by default, or to the path provided with `--output`. The `--debug` option also writes separate intermediate images.
 
 **When to use:** Lots with clearly visible white line markings. Requires `scikit-learn`.
 
@@ -204,6 +211,8 @@ python smart_parking_lines.py <image_path> --debug
 python smart_parking_lines_video.py CarPark.mp4
 python smart_parking_lines_video.py CarPark.mp4 --stride 60 --max_frames 10
 python smart_parking_lines_video.py CarPark.mp4 --display
+python smart_parking_lines_video.py CarPark.mp4 --output experiment
+python smart_parking_lines_video.py CarPark.mp4 --output results/test
 ```
 
 | Option | Default | Description |
@@ -211,6 +220,9 @@ python smart_parking_lines_video.py CarPark.mp4 --display
 | `--stride` | 60 | Process every Nth frame |
 | `--max_frames` | 5 | Maximum number of frames to process |
 | `--display` | off | Show a live window with annotated frames |
+| `--output PREFIX` | Video filename stem | Prefix for extracted frames and annotated images |
+
+For video, `--output` is a filename **prefix**, not one output image path. For example, `--output experiment` creates files such as `experiment_frame_00000.jpg` and `experiment_detection_00000.jpg`. With no option, `CarPark.mp4` still produces `CarPark_frame_00000.jpg` and `CarPark_detection_00000.jpg`. You can also use a path prefix such as `--output results/test`; the parent directory is created automatically.
 
 ---
 

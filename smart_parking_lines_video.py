@@ -43,17 +43,23 @@ def main():
         action="store_true",
         help="Show a live OpenCV window with annotated frames.",
     )
+    parser.add_argument(
+        "--output",
+        default=None,
+        metavar="PREFIX",
+        help="Filename prefix for generated images (default: video filename)"
+    )
 
     args = parser.parse_args()
 
     video_path = args.video_path
     if not os.path.exists(video_path):
-        print(f"❌ Video not found: {video_path}")
+        print(f"❌ Error: Video not found: {video_path}")
         return
 
     cap = cv2.VideoCapture(video_path)
     if not cap.isOpened():
-        print(f"❌ Could not open video: {video_path}")
+        print(f"❌ Error: Could not open video: {video_path}")
         return
 
     print("============================================================")
@@ -65,7 +71,8 @@ def main():
 
     frame_idx = 0
     processed = 0
-    base = Path(video_path).stem
+    base = args.output if args.output is not None else Path(video_path).stem
+    Path(base).parent.mkdir(parents=True, exist_ok=True)
 
     while processed < args.max_frames:
         ret, frame = cap.read()
@@ -108,7 +115,7 @@ def main():
     else:
         print(
             f"\n✅ Done. Generated {processed} annotated frame(s) from {video_path} "
-            f"(look for *{base}_detection_*.jpg)."
+            f"(look for {base}_detection_*.jpg)."
         )
 
 
